@@ -4,10 +4,20 @@ type LogEntry = {
 };
 
 // Define the structure of a single day's logbook
+// type Logbook = {
+//   logbook: LogEntry[];
+//   currentHour: number;
+//   totalTimeTraveled: number;
+// };
+
 type Logbook = {
   logbook: LogEntry[];
   currentHour: number;
   totalTimeTraveled: number;
+  timeSpentInOffDuty: number;
+  timeSpentInOnDuty: number;
+  timeSpentInDriving: number;
+  timeSpentInSleeperBerth: number;
 };
 
 export const autoFillLogbook = (
@@ -15,7 +25,8 @@ export const autoFillLogbook = (
   DurationFromCurrentLocationToPickup: number = 307,
   totalTimeMinutes: number = 855,
   totalDistanceMiles: number = 624,
-  previoustotalTimeTraveled: number = 0
+  previoustotalTimeTraveled: number = 0,
+  prevSleeperBerthHr: number = 0
 ): Logbook[] => {
   const drivingTime = totalTimeMinutes;
   const pickUpAndDropOffTime = 60;
@@ -28,6 +39,11 @@ export const autoFillLogbook = (
     drivingTime + totalTimeToRefuel + pickUpAndDropOffTime;
 
   const remainingCycleHours = (70 - currentCycleHours) * 60;
+  let timeSpentInOffDuty = 0;
+  let timeSpentInOnDuty = 0;
+  let timeSpentInDriving = 0;
+  let timeSpentInSleeperBerth = 0;
+
   if (remainingCycleHours < totalOnDutyTime) {
     console.log("Driver does not have enough hours left in cycle.");
     return [];
@@ -38,29 +54,58 @@ export const autoFillLogbook = (
   let currentHour: number = 0;
 
   // Function to generate a new day's logbook
+  //   const generateNewLog = (): Logbook => {
+  //     return { logbook: [], currentHour: 0, totalTimeTraveled };
+  //   };
+
   const generateNewLog = (): Logbook => {
-    return { logbook: [], currentHour: 0, totalTimeTraveled };
+    return {
+      logbook: [],
+      currentHour: 0,
+      totalTimeTraveled,
+      timeSpentInOffDuty,
+      timeSpentInOnDuty,
+      timeSpentInDriving,
+      timeSpentInSleeperBerth,
+    };
   };
 
   const newLog = generateNewLog();
   logbooks.push(newLog);
 
-  // **Step 1: Start with Off-Duty until 6:30 AM**
-  newLog.logbook.push({ hour: currentHour, row: "off-duty" });
-  currentHour += 6.5;
-  newLog.logbook.push({ hour: currentHour, row: "off-duty" });
+  if (prevSleeperBerthHr > 0) {
+    // **Step 1: Start at On-Duty (Vehicle Check)**
+    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    currentHour += 0.5;
 
-  // **Step 2: Switch to On-Duty (Vehicle Check)**
-  newLog.logbook.push({ hour: currentHour, row: "on-duty" });
-  currentHour += 0.5;
+    // **Step 2: Stay On-Duty Before Driving**
+    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    currentHour += 0.5;
+    currentOnDutyHour += 0.5;
+    timeSpentInOnDuty += 0.5;
 
-  // **Step 3: Stay On-Duty Before Driving**
-  newLog.logbook.push({ hour: currentHour, row: "on-duty" });
-  currentHour += 0.5;
-  currentOnDutyHour += 0.5;
+    // **Step 3: Start Driving to Pickup or dropp-off**
+    newLog.logbook.push({ hour: currentHour, row: "driving" });
+  } else {
+    // **Step 1: Start with Off-Duty until 6:30 AM**
+    newLog.logbook.push({ hour: currentHour, row: "off-duty" });
+    currentHour += 6.5;
+    timeSpentInOffDuty += 6.5;
+    newLog.logbook.push({ hour: currentHour, row: "off-duty" });
 
-  // **Step 4: Start Driving to Pickup**
-  newLog.logbook.push({ hour: currentHour, row: "driving" });
+    // **Step 2: Switch to On-Duty (Vehicle Check)**
+    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    currentHour += 0.5;
+
+    // **Step 3: Stay On-Duty Before Driving**
+    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    currentHour += 0.5;
+    currentOnDutyHour += 0.5;
+    timeSpentInOnDuty += 0.5;
+
+    // **Step 4: Start Driving to Pickup**
+    newLog.logbook.push({ hour: currentHour, row: "driving" });
+  }
 
   while (totalTimeTraveled < DurationFromCurrentLocationToPickup) {
     // Base Condition: Stop Recursion if Trip is Done
@@ -72,6 +117,7 @@ export const autoFillLogbook = (
     newLog.logbook.push({ hour: currentHour, row: "driving" });
     totalTimeTraveled += 60;
     timeTraveledWithinEightHrs += 60;
+    timeSpentInDriving += 1;
     milesTraveled += (totalDistanceMiles / drivingTime) * 60; // Convert minutes to miles
 
     // **Mandatory 30-min break after 8 hours driving or to refuel after 1,000 miles**
@@ -86,6 +132,7 @@ export const autoFillLogbook = (
       newLog.logbook.push({ hour: currentHour, row: "on-duty" });
       currentHour += 0.5;
       currentOnDutyHour += 0.5;
+      timeSpentInOnDuty += 0.5;
       newLog.logbook.push({ hour: currentHour, row: "on-duty" });
 
       newLog.logbook.push({ hour: currentHour, row: "driving" });
@@ -106,8 +153,9 @@ export const autoFillLogbook = (
       newLog.logbook.push({ hour: currentHour, row: "sleeper" });
 
       // **Stay in Sleeper Berth for 10 hours**
-      const timeToStayInSleeperBerth = 24 - currentHour
+      const timeToStayInSleeperBerth = 24 - currentHour;
       currentHour += timeToStayInSleeperBerth;
+      timeSpentInSleeperBerth += timeToStayInSleeperBerth;
       newLog.logbook.push({ hour: currentHour, row: "sleeper" });
 
       // **Start a New Day & Continue Logging (Recursive Call)**
@@ -116,7 +164,8 @@ export const autoFillLogbook = (
         DurationFromCurrentLocationToPickup - totalTimeTraveled, // ✅ Remaining travel time to pickup
         totalTimeMinutes - totalTimeTraveled, // ✅ Remaining total trip time
         totalDistanceMiles,
-        totalTimeTraveled // ✅ Keep tracking time across days
+        totalTimeTraveled, // ✅ Keep tracking time across days
+        timeToStayInSleeperBerth
       );
 
       return [...logbooks, ...nextDayLogs]; // Combine all logbooks
@@ -128,6 +177,7 @@ export const autoFillLogbook = (
   console.log("Arrived at pickup location");
   currentHour += 0.5; // 30-minute On-Duty for Pickup
   currentOnDutyHour += 0.5;
+  timeSpentInOnDuty += 0.5;
 
   newLog.logbook.push({ hour: currentHour, row: "on-duty" });
 
@@ -149,6 +199,7 @@ export const autoFillLogbook = (
     newLog.logbook.push({ hour: currentHour, row: "driving" });
     totalTimeTraveled += 60;
     timeTraveledWithinEightHrs += 60;
+    timeSpentInDriving += 1;
     milesTraveled += (totalDistanceMiles / drivingTime) * 60; // Convert minutes to miles
 
     // **Mandatory 30-min break after 8 hours driving or to refuel after 1,000 miles**
@@ -163,6 +214,7 @@ export const autoFillLogbook = (
       newLog.logbook.push({ hour: currentHour, row: "on-duty" });
       currentHour += 0.5;
       currentOnDutyHour += 0.5;
+      timeSpentInOnDuty += 0.5;
       newLog.logbook.push({ hour: currentHour, row: "on-duty" });
 
       newLog.logbook.push({ hour: currentHour, row: "driving" });
@@ -183,8 +235,9 @@ export const autoFillLogbook = (
       newLog.logbook.push({ hour: currentHour, row: "sleeper" });
 
       // **Stay in Sleeper Berth for 10 hours**
-      const timeToStayInSleeperBerth = 24 - currentHour
+      const timeToStayInSleeperBerth = 24 - currentHour;
       currentHour += timeToStayInSleeperBerth;
+      timeSpentInSleeperBerth += timeToStayInSleeperBerth;
       newLog.logbook.push({ hour: currentHour, row: "sleeper" });
 
       // **Start a New Day & Continue Logging (Recursive Call)**
@@ -193,7 +246,8 @@ export const autoFillLogbook = (
         DurationFromCurrentLocationToPickup - totalTimeTraveled, // ✅ Remaining travel time to pickup
         totalTimeMinutes - totalTimeTraveled, // ✅ Remaining total trip time
         totalDistanceMiles,
-        totalTimeTraveled // ✅ Keep tracking time across days
+        totalTimeTraveled, // ✅ Keep tracking time across days
+        timeToStayInSleeperBerth
       );
 
       return [...logbooks, ...nextDayLogs]; // Combine all logbooks
@@ -205,14 +259,21 @@ export const autoFillLogbook = (
   console.log("Arrived at drop-off location");
   currentHour += 0.5;
   currentOnDutyHour += 0.5;
+  timeSpentInOnDuty += 0.5;
   newLog.logbook.push({ hour: currentHour, row: "on-duty" });
 
   // **Step 9: Switch to Sleeper Berth (End of the Trip)**
   newLog.logbook.push({ hour: currentHour, row: "sleeper" });
   console.log("Switching to sleeper berth");
-  const timeToStayInSleeperBerth = 24 - currentHour
-  currentHour += timeToStayInSleeperBerth;;
+  const timeToStayInSleeperBerth = 24 - currentHour;
+  currentHour += timeToStayInSleeperBerth;
+  timeSpentInSleeperBerth += timeToStayInSleeperBerth;
   newLog.logbook.push({ hour: currentHour, row: "sleeper" });
+
+  newLog.timeSpentInOffDuty = timeSpentInOffDuty;
+  newLog.timeSpentInOnDuty = timeSpentInOnDuty;
+  newLog.timeSpentInDriving = timeSpentInDriving;
+  newLog.timeSpentInSleeperBerth = timeSpentInSleeperBerth;
 
   return logbooks; // Return multiple days of logs
 };
