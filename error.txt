@@ -1,0 +1,24 @@
+<--- Last few GCs --->
+
+[18068:000001D4E7BD1000]   294176 ms: Mark-Compact (reduce) 4034.7 (4039.1) -> 4034.7 (4039.1) MB, pooled: 0 MB, 2458.36 / 0.00 ms  (+ 25.1 ms in 0 steps since start of marking, biggest step 0.0 ms, walltime since start of marking 2510 ms) (average mu = 0[18068:000001D4E7BD1000]   298005 ms: Mark-Compact (reduce) 4039.2 (4043.1) -> 4038.7 (4043.1) MB, pooled: 0 MB, 2639.03 / 0.00 ms  (+ 8.0 ms in 0 steps since start of marking, biggest step 0.0 ms, walltime since start of 
+marking 2657 ms) (average mu = 0.
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF74CF8780D node::SetCppgcReference+16573
+ 2: 00007FF74CEF00C8 v8::base::CPU::num_virtual_address_bits+98648
+ 3: 00007FF74DBE8DF1 v8::Isolate::ReportExternalAllocationLimitReached+65
+ 4: 00007FF74DBD56A6 v8::Function::Experimental_IsNopFunction+2694
+ 5: 00007FF74DA11010 v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+33824
+ 6: 00007FF74DA0A394 v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+6052
+ 7: 00007FF74DA060AD v8::Platform::SystemClockTimeMillis+648333
+ 8: 00007FF74D2288AD BIO_ssl_shutdown+189
+ 9: 00007FF74DA0DC06 v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+20502
+10: 00007FF74DA23718 v8::Isolate::GetHeapProfiler+8488
+11: 00007FF74DA23842 v8::Isolate::GetHeapProfiler+8786
+12: 00007FF74DA346C7 v8::Isolate::GetHeapProfiler+78039
+13: 00007FF74D6E7CF8 v8::internal::Version::GetString+444968
+14: 00007FF6EDC7027A
