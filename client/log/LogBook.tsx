@@ -133,11 +133,14 @@ const SingleLogbook: React.FC<LogbookProps> = ({
     <div className="flex flex-col items-center gap-2">
       <h3 className="text-lg font-bold">Day {day}</h3>
       <div className="flex flex-row justify-center items-center overflow-x-auto border-solid border-2 border-black p-3">
-        <div className="text-xs font-bold flex flex-col justify-center items-end gap-4.5 mr-2">
+        <div className="text-xs font-bold flex flex-col justify-center items-end gap-3.5 mr-2">
           <p>Off Duty</p>
           <p>Sleeper Berth</p>
           <p>Driving</p>
+          <div className="flex flex-col justify-center items-center">
           <p>On Duty</p>
+          <p className="text-xs">(Not Driving)</p>
+          </div>
         </div>
         <canvas ref={canvasRef}></canvas>
         <div className="flex flex-col justify-center items-end ml-2 border-[1px] font-bold">
@@ -155,6 +158,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
           </div>
         </div>
       </div>
+        <div className="self-end mr-[220px] border-solid border-b-[2px] font-bold px-4">{timeSpentInOffDuty + timeSpentInSleeperBerth + timeSpentInDriving + timeSpentInOnDuty}</div>
     </div>
   );
 };
