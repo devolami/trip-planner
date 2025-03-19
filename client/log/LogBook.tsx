@@ -140,17 +140,17 @@ const SingleLogbook: React.FC<LogbookProps> = ({
           <p>On Duty</p>
         </div>
         <canvas ref={canvasRef}></canvas>
-        <div className="flex flex-col justify-center items-end ml-2 border-[1px]">
-          <div className="w-[30px] h-[30px] bg-[#FFD700] border-b-[1px]">
+        <div className="flex flex-col justify-center items-end ml-2 border-[1px] font-bold">
+          <div className="w-[40px] h-[30px] bg-[#FFD700] border-b-[1px] text-center">
             {timeSpentInOffDuty}
           </div>
-          <div className="w-[30px] h-[30px] bg-[#87CEEB] border-b-[1px]">
+          <div className="w-[40px] h-[30px] bg-[#87CEEB] border-b-[1px] text-center">
             {timeSpentInSleeperBerth}
           </div>
-          <div className="w-[30px] h-[30px] bg-[#90EE90] border-b-[1px]">
+          <div className="w-[40px] h-[30px] bg-[#90EE90] border-b-[1px] text-center">
             {timeSpentInDriving}
           </div>
-          <div className="w-[30px] h-[30px] bg-[#FFB6C1]">
+          <div className="w-[40px] h-[30px] bg-[#FFB6C1] text-center">
             {timeSpentInOnDuty}
           </div>
         </div>

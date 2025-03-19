@@ -3,13 +3,6 @@ type LogEntry = {
   row: "off-duty" | "sleeper" | "driving" | "on-duty";
 };
 
-// Define the structure of a single day's logbook
-// type Logbook = {
-//   logbook: LogEntry[];
-//   currentHour: number;
-//   totalTimeTraveled: number;
-// };
-
 type Logbook = {
   logbook: LogEntry[];
   currentHour: number;
@@ -53,11 +46,6 @@ export const autoFillLogbook = (
   let totalTimeTraveled: number = previoustotalTimeTraveled;
   let currentHour: number = 0;
 
-  // Function to generate a new day's logbook
-  //   const generateNewLog = (): Logbook => {
-  //     return { logbook: [], currentHour: 0, totalTimeTraveled };
-  //   };
-
   const generateNewLog = (): Logbook => {
     return {
       logbook: [],
@@ -73,7 +61,7 @@ export const autoFillLogbook = (
   const newLog = generateNewLog();
   logbooks.push(newLog);
 
-  if (prevSleeperBerthHr > 0) {
+  if (prevSleeperBerthHr > 0 && prevSleeperBerthHr >= 10) {
     // **Step 1: Start at On-Duty (Vehicle Check)**
     newLog.logbook.push({ hour: currentHour, row: "on-duty" });
     currentHour += 0.5;
@@ -84,7 +72,27 @@ export const autoFillLogbook = (
     currentOnDutyHour += 0.5;
     timeSpentInOnDuty += 0.5;
 
-    // **Step 3: Start Driving to Pickup or dropp-off**
+    // **Step 3: Start Driving to Pickup or drop-off**
+    newLog.logbook.push({ hour: currentHour, row: "driving" });
+  } else if (prevSleeperBerthHr > 0 && prevSleeperBerthHr < 10) {
+    // **Step 1: Start at sleeper berth until you have spent 10 hours there**
+    newLog.logbook.push({ hour: currentHour, row: "sleeper" });
+    currentHour += 10 - prevSleeperBerthHr;
+    timeSpentInSleeperBerth += 10 - prevSleeperBerthHr;
+    newLog.logbook.push({ hour: currentHour, row: "sleeper" });
+
+    // **Step 2: Switch to On-Duty (Vehicle Check)**
+    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    currentHour += 0.5;
+    timeSpentInOnDuty += 0.5;
+
+    // **Step 3: Stay On-Duty Before Driving**
+    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    currentHour += 0.5;
+    currentOnDutyHour += 0.5;
+    timeSpentInDriving += 0.5;
+
+    // **Step 4: Start Driving to Pickup**
     newLog.logbook.push({ hour: currentHour, row: "driving" });
   } else {
     // **Step 1: Start with Off-Duty until 6:30 AM**
@@ -96,17 +104,17 @@ export const autoFillLogbook = (
     // **Step 2: Switch to On-Duty (Vehicle Check)**
     newLog.logbook.push({ hour: currentHour, row: "on-duty" });
     currentHour += 0.5;
+    timeSpentInOnDuty += 0.5;
 
     // **Step 3: Stay On-Duty Before Driving**
     newLog.logbook.push({ hour: currentHour, row: "on-duty" });
     currentHour += 0.5;
     currentOnDutyHour += 0.5;
-    timeSpentInOnDuty += 0.5;
+    timeSpentInDriving += 0.5;
 
     // **Step 4: Start Driving to Pickup**
     newLog.logbook.push({ hour: currentHour, row: "driving" });
   }
-
   while (totalTimeTraveled < DurationFromCurrentLocationToPickup) {
     // Base Condition: Stop Recursion if Trip is Done
     if (totalTimeTraveled >= DurationFromCurrentLocationToPickup) {
