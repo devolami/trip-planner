@@ -1,11 +1,10 @@
 "use client";
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { InputFieldProps, InputData, Coordinates } from "./types";
 import mapboxSdk from "@mapbox/mapbox-sdk";
 import geocoding from "@mapbox/mapbox-sdk/services/geocoding";
 import { GeocodeFeature } from "@mapbox/mapbox-sdk/services/geocoding";
 import { useRoute } from "./RouteContext";
-
 
 const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN! as string;
 
@@ -23,10 +22,11 @@ export const InputField: React.FC<InputFieldProps> = ({
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleInputChange =
-    (name: keyof InputData) =>
+    (name: keyof InputData, index: number) =>
     async (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
-      setValue(name, value, {shouldValidate: true})
+      setValue(name, value, { shouldValidate: true });
+
       if (value.length > 2) {
         try {
           const response = await geocodingClient
@@ -36,8 +36,33 @@ export const InputField: React.FC<InputFieldProps> = ({
             })
             .send();
 
-          setSuggestions(response.body.features);
+          const results = response.body.features;
+          setSuggestions(results);
           setFocusedField(name);
+
+          // If results exist, extract the first suggestion's coordinates
+          if (results.length > 0 && index !== config.length - 1) {
+            // Do not extract lat and log from current_cycle_hour field
+            const suggestion = results[0]; // Pick the first result
+            const field_coordinates: Coordinates = {
+              longitude: suggestion.center[0],
+              latitude: suggestion.center[1],
+            };
+
+            // Update the route coordinates only if within range
+            if (index !== config.length - 1) {
+              // Do not set coordinates for current_cycle_hour field
+              setRouteCoordinates((prevCoordinates) => {
+                const newCoordinates = [...prevCoordinates];
+                if (index < newCoordinates.length) {
+                  newCoordinates[index] = field_coordinates;
+                } else {
+                  newCoordinates.push(field_coordinates); // Ensure new entries are added
+                }
+                return newCoordinates;
+              });
+            }
+          }
         } catch (error) {
           console.error("Geocoding error:", error);
         }
@@ -46,7 +71,6 @@ export const InputField: React.FC<InputFieldProps> = ({
         setFocusedField(null);
       }
     };
-
 
   return (
     <>
@@ -64,7 +88,7 @@ export const InputField: React.FC<InputFieldProps> = ({
             placeholder={fieldConfig.placeholder}
             id={fieldConfig.id}
             className="my-[10px] p-[20px] rounded-sm border-[1.5px] border-[#F4EBFF] w-full font-normal text-[16px] bg-white text-[#364259] focus:outline-none focus:border-[#F4EBFF]"
-            onChange={handleInputChange(fieldConfig.name)}
+            onChange={handleInputChange(fieldConfig.name, index)}
           />
 
           {suggestions.length > 0 &&
@@ -92,7 +116,6 @@ export const InputField: React.FC<InputFieldProps> = ({
                           });
                         }
                         setSuggestions([]);
-                        
                       }}
                       key={suggestion.id}
                       className="cursor-pointer m-4"

@@ -16,7 +16,7 @@ export function useSubmit() {
     reset,
   } = form;
   const { errors, isLoading } = formState;
-  const {getRoutes, tripInfo} = useRoute()
+  const {getRoutes, tripInfo, pickUpTime} = useRoute()
   // const [durationMinutes, setDurationMinutes] = useState<number>(0)
   // const [distanceMiles, setDistanceMiles] = useState<number>(0)
   const [drawLog, setDrawLog] = useState<boolean>(false)

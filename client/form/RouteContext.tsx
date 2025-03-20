@@ -15,6 +15,7 @@ interface RouteContextType {
   coords: number[][];
   fuelingMarkers: Coordinates[]
   tripInfo: TripInfoProps
+  pickUpTime: number
 }
 
 const RouteContext = createContext<RouteContextType | undefined>(undefined);
@@ -39,6 +40,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tripInfo, setTripInfo] = useState<TripInfoProps>({
     totalTimeMinutes: 0, totalDistanceMiles: 0
   })
+  const [pickUpTime, setPickUpTime] = useState<number>(0);
   const [fetchError, setFetchError] = useState<string>("");
   const [coords, setCoords] = useState<number[][]>([]);
     const [fuelingMarkers, setFuelingMarkers] = useState<Coordinates[]>([]);
@@ -74,28 +76,49 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
   
       try {
         const firstCoordinate = routeCoordinates[0]
+        const secondCoordinate = routeCoordinates[1]
         const lastCoordinate = routeCoordinates[2]
 
-        const waypoints = [
+        const totalDistanceWaypoints = [
             { coordinates: [firstCoordinate.longitude, firstCoordinate.latitude] as [number, number] },
             { coordinates: [lastCoordinate.longitude, lastCoordinate.latitude] as [number, number] },
         ];
+
+        const pickupDistanceWaypoints = [
+          { coordinates: [firstCoordinate.longitude, firstCoordinate.latitude] as [number, number] },
+          { coordinates: [secondCoordinate.longitude, secondCoordinate.latitude] as [number, number] },
+      ];
   
-        const response = await directionServices
+        const totalDistanceResponse = await directionServices
           .getDirections({
-            waypoints: waypoints,
+            waypoints: totalDistanceWaypoints,
             profile: "driving",
           })
           .send();
+
+          const pickupDistanceResponse = await directionServices
+          .getDirections({
+            waypoints: pickupDistanceWaypoints,
+            profile: "driving",
+          })
+          .send();
+
+        
+          if (pickupDistanceResponse.body.routes && pickupDistanceResponse.body.routes.length > 0) {
+            console.log("Successful! Fetching of pickup distance")
+            const route = pickupDistanceResponse.body.routes[0];
+            console.log("Inspect response: ", route.geometry)
+            const durationMinutes = route.duration / 60;
+            setPickUpTime(durationMinutes)
+          }
   
-        if (response.body.routes && response.body.routes.length > 0) {
+        if (totalDistanceResponse.body.routes && totalDistanceResponse.body.routes.length > 0) {
           console.log("Successful! Fetching of distance")
-          const route = response.body.routes[0];
+          const route = totalDistanceResponse.body.routes[0];
           console.log("Inspect response: ", route.geometry)
           const totalDistanceMiles = route.distance * 0.000621371;
           const durationMinutes = route.duration / 60;
           setTripInfo({totalDistanceMiles:totalDistanceMiles, totalTimeMinutes: durationMinutes})
-  
           const numFuelingStops = Math.floor(totalDistanceMiles / 1000);
           const fuelingMarkersCoords: Coordinates[] = [];
           console.log("Number of fuelling stops: ", numFuelingStops)
@@ -177,7 +200,8 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
         coords,
         fuelingMarkers,
         calculateFuelingMarkers,
-        tripInfo
+        tripInfo,
+        pickUpTime
       }}
     >
       {children}

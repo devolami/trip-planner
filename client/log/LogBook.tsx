@@ -62,7 +62,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
     canvas.width = cols * gridSize;
     canvas.height = rows * gridSize;
 
-    const rowColors: string[] = ["#FFD700", "#87CEEB", "#90EE90", "#FFB6C1"];
+    const rowColors: string[] = ["#DAC0FD", "#FFECC5", "#CFFFE8", "#C9F5FF"];
     const rowPositions: Record<string, number> = {
       "off-duty": 20, //15
       sleeper: 60, //45
@@ -80,12 +80,37 @@ const SingleLogbook: React.FC<LogbookProps> = ({
     const drawGrid = () => {
       ctx.strokeStyle = "black";
       ctx.lineWidth = 1;
+    
       for (let x = 0; x <= canvas.width; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
         ctx.stroke();
+    
+        // 🎯 Draw small lines inside each grid in all rows
+        const interval = gridSize / 4; // Divide each grid into 4 equal parts
+    
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          // ✅ First small line (10px)
+          ctx.beginPath();
+          ctx.moveTo(x + interval, y); // Start at top of the box
+          ctx.lineTo(x + interval, y + 10); // 10px height
+          ctx.stroke();
+    
+          // ✅ Middle line (20px)
+          ctx.beginPath();
+          ctx.moveTo(x + 2 * interval, y);
+          ctx.lineTo(x + 2 * interval, y + 20); // 20px height
+          ctx.stroke();
+    
+          // ✅ Third small line (10px)
+          ctx.beginPath();
+          ctx.moveTo(x + 3 * interval, y);
+          ctx.lineTo(x + 3 * interval, y + 10); // 10px height
+          ctx.stroke();
+        }
       }
+    
       for (let y = 0; y <= canvas.height; y += gridSize) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -93,9 +118,11 @@ const SingleLogbook: React.FC<LogbookProps> = ({
         ctx.stroke();
       }
     };
+    
+    
 
     const drawLogbook = () => {
-      ctx.strokeStyle = "red";
+      ctx.strokeStyle = "black";
       ctx.lineWidth = 3;
       ctx.beginPath();
 
@@ -144,7 +171,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
         {/* ✅ Main Canvas Container */}
         <div className="relative flex flex-col min-h-0 pt-12">
           <canvas ref={canvasRef}></canvas>
-          <div className="flex flex-row gap-6 absolute top-[-2px] left-[-30px] text-xs font-bold bg-[#9E77ED] p-2 justify-center items-end">
+          <div className="flex flex-row gap-6 absolute top-[-2px] left-[-30px] text-xs font-bold bg-[#9E77ED] text-white p-2 justify-center items-end">
             <p className="mr-[-10px]">Mid-<br/>Night</p>
             <p>1</p>
             <p className="mr-2">2</p>
@@ -168,7 +195,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
             <p className="mr-2">8</p>
             <p>9</p>
             <p>10</p>
-            <p>11</p>
+            <p className="mr-1">11</p>
             <p className="mr-[-8px]">Mid-<br/>Night</p>
             <p>Total <br/> Hours</p>
           </div>
@@ -184,7 +211,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
               return (
                 <div
                   key={index}
-                  className="absolute text-xs font-bold text-black rotate-45 pt-12"
+                  className="absolute text-xs font-bold text-black rotate-45 pt-12 tracking-wide"
                   style={{
                     left: `${x - 6}px`,
                     top: "200px",
@@ -199,29 +226,29 @@ const SingleLogbook: React.FC<LogbookProps> = ({
 
         {/* ✅ Total Hours for Each Duty */}
         <div className="flex flex-col font-bold pt-12">
-          <div className="w-[45px] h-[40px] bg-[#FFD700] border-b-[1px] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#DAC0FD] border-b-[1px] flex flex-row justify-center items-center">
             {!Number.isInteger(timeSpentInOffDuty)
               ? `${Math.trunc(timeSpentInOffDuty)}:30`
               : `${timeSpentInOffDuty}:00`}
           </div>
-          <div className="w-[45px] h-[40px] bg-[#87CEEB] border-b-[1px] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#FFECC5] border-b-[1px] flex flex-row justify-center items-center">
             {!Number.isInteger(timeSpentInSleeperBerth)
               ? `${Math.trunc(timeSpentInSleeperBerth)}:30`
               : `${timeSpentInSleeperBerth}:00`}
           </div>
-          <div className="w-[45px] h-[40px] bg-[#90EE90] border-b-[1px] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#CFFFE8] border-b-[1px] flex flex-row justify-center items-center">
             {!Number.isInteger(timeSpentInDriving)
               ? `${Math.trunc(timeSpentInDriving)}:30`
               : `${timeSpentInDriving}:00`}
           </div>
-          <div className="w-[45px] h-[40px] bg-[#FFB6C1] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#C9F5FF] flex flex-row justify-center items-center">
             {!Number.isInteger(timeSpentInOnDuty)
               ? `${Math.trunc(timeSpentInOnDuty)}:30`
               : `${timeSpentInOnDuty}:00`}
           </div>
-          {/* ✅ Total Hours Row */}
+          {/* Total Hours Row */}
 
-          <p className="border-solid border-b-[2px] font-bold px-4 ml-[-16px] mt-6">
+          <p className="border-solid border-b-[2px] text-white font-bold h-[40px] w-[45px] px-6 ml-[-5px] mt-6 bg-[#9E77ED] flex flex-col justify-center items-center">
             {timeSpentInOffDuty +
               timeSpentInSleeperBerth +
               timeSpentInDriving +

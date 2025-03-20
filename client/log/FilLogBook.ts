@@ -19,7 +19,7 @@ export const autoFillLogbook = (
   DurationFromCurrentLocationToPickup: number = 307,
   totalTimeMinutes: number = 855,
   totalDistanceMiles: number = 624,
-  previoustotalTimeTraveled: number = 0,
+  previousTotalTimeTraveled: number = 0,
   prevSleeperBerthHr: number = 0
 ): Logbook[] => {
   const drivingTime = totalTimeMinutes;
@@ -44,7 +44,7 @@ export const autoFillLogbook = (
   }
 
   const logbooks: Logbook[] = [];
-  let totalTimeTraveled: number = previoustotalTimeTraveled;
+  let totalTimeTraveled: number = previousTotalTimeTraveled;
   let currentHour: number = 0;
 
   const generateNewLog = (): Logbook => {
