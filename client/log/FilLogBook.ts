@@ -1,6 +1,7 @@
 type LogEntry = {
   hour: number;
   row: "off-duty" | "sleeper" | "driving" | "on-duty";
+  action?: string
 };
 
 type Logbook = {
@@ -63,11 +64,11 @@ export const autoFillLogbook = (
 
   if (prevSleeperBerthHr > 0 && prevSleeperBerthHr >= 10) {
     // **Step 1: Start at On-Duty (Vehicle Check)**
-    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    newLog.logbook.push({ hour: currentHour, row: "on-duty", action: "Switched to on-duty" });
     currentHour += 0.5;
 
     // **Step 2: Stay On-Duty Before Driving**
-    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    newLog.logbook.push({ hour: currentHour, row: "on-duty", action: "Pre-trip/TIV" });
     currentHour += 0.5;
     currentOnDutyHour += 0.5;
     timeSpentInOnDuty += 0.5;
@@ -87,7 +88,7 @@ export const autoFillLogbook = (
     timeSpentInOnDuty += 0.5;
 
     // **Step 3: Stay On-Duty Before Driving**
-    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    newLog.logbook.push({ hour: currentHour, row: "on-duty", action: "Pre-trip/TIV" });
     currentHour += 0.5;
     currentOnDutyHour += 0.5;
     timeSpentInDriving += 0.5;
@@ -107,7 +108,7 @@ export const autoFillLogbook = (
     timeSpentInOnDuty += 0.5;
 
     // **Step 3: Stay On-Duty Before Driving**
-    newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+    newLog.logbook.push({ hour: currentHour, row: "on-duty", action: "Pre-trip/TIV" });
     currentHour += 0.5;
     currentOnDutyHour += 0.5;
     timeSpentInDriving += 0.5;
@@ -141,7 +142,8 @@ export const autoFillLogbook = (
       currentHour += 0.5;
       currentOnDutyHour += 0.5;
       timeSpentInOnDuty += 0.5;
-      newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+       const action = timeTraveledWithinEightHrs >= 8 * 60 ? "30-minute break": "Refuelling"
+      newLog.logbook.push({ hour: currentHour, row: "on-duty", action: action });
 
       newLog.logbook.push({ hour: currentHour, row: "driving" });
       milesTraveled = milesTraveled >= 1000 ? 0 : milesTraveled;
@@ -187,7 +189,7 @@ export const autoFillLogbook = (
   currentOnDutyHour += 0.5;
   timeSpentInOnDuty += 0.5;
 
-  newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+  newLog.logbook.push({ hour: currentHour, row: "on-duty", action: "Pickup" });
 
   // **Step 6: Start Driving to Drop-off Immediately**
   newLog.logbook.push({ hour: currentHour, row: "driving" });
@@ -223,7 +225,8 @@ export const autoFillLogbook = (
       currentHour += 0.5;
       currentOnDutyHour += 0.5;
       timeSpentInOnDuty += 0.5;
-      newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+      const action = timeTraveledWithinEightHrs >= 8 * 60 ? "30-minute break": "Refuelling"
+      newLog.logbook.push({ hour: currentHour, row: "on-duty", action: action });
 
       newLog.logbook.push({ hour: currentHour, row: "driving" });
       milesTraveled = milesTraveled >= 1000 ? 0 : milesTraveled;
@@ -268,7 +271,7 @@ export const autoFillLogbook = (
   currentHour += 0.5;
   currentOnDutyHour += 0.5;
   timeSpentInOnDuty += 0.5;
-  newLog.logbook.push({ hour: currentHour, row: "on-duty" });
+  newLog.logbook.push({ hour: currentHour, row: "on-duty", action: "Drop-off" });
 
   // **Step 9: Switch to Sleeper Berth (End of the Trip)**
   newLog.logbook.push({ hour: currentHour, row: "sleeper" });

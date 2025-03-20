@@ -7,7 +7,7 @@ import { GeocodeFeature } from "@mapbox/mapbox-sdk/services/geocoding";
 import { useRoute } from "./RouteContext";
 
 
-const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN!;
+const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN! as string;
 
 const mapboxClient = mapboxSdk({ accessToken: ACCESS_TOKEN });
 const geocodingClient = geocoding(mapboxClient);
