@@ -195,6 +195,7 @@ export const autoFillLogbook = (
   newLog.logbook.push({ hour: currentHour, row: "driving" });
   //   totalTimeTraveled = 0; // Reset driving time for drop-off
 
+
   // **Step 7: Continue Driving to Drop-off**
   while (
     totalTimeTraveled <
@@ -265,6 +266,7 @@ export const autoFillLogbook = (
     }
   }
 
+
   // **Step 8: On-Duty at Drop-off before Sleeping**
   newLog.logbook.push({ hour: currentHour, row: "on-duty" });
   console.log("Arrived at drop-off location");
@@ -285,6 +287,8 @@ export const autoFillLogbook = (
   newLog.timeSpentInOnDuty = timeSpentInOnDuty;
   newLog.timeSpentInDriving = timeSpentInDriving;
   newLog.timeSpentInSleeperBerth = timeSpentInSleeperBerth;
+
+  console.log("This is the logbook", logbooks)
 
   return logbooks; // Return multiple days of logs
 };

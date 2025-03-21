@@ -36,3 +36,18 @@ export type InputConfigProps = {
     setValue: UseFormSetValue<InputData>
   };
 
+  export type LogEntry = {
+    hour: number;
+    row: "off-duty" | "sleeper" | "driving" | "on-duty";
+    action?: string;
+  };
+  
+  export type Logbook = {
+    logbook: LogEntry[];
+    currentHour: number;
+    totalTimeTraveled: number;
+    timeSpentInOffDuty: number;
+    timeSpentInOnDuty: number;
+    timeSpentInDriving: number;
+    timeSpentInSleeperBerth: number;
+  };

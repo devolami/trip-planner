@@ -1,21 +1,27 @@
 "use client";
-import React, { createContext, useState, useContext, useCallback } from "react";
+import React, { createContext, useState, useContext, useCallback, useRef, useEffect } from "react";
 import mapboxSdk from "@mapbox/mapbox-sdk";
 import Directions from "@mapbox/mapbox-sdk/services/directions";
-import { Coordinates } from "./types";
+import { Coordinates } from "../form";
 import polyline from "@mapbox/polyline";
+import { Logbook } from "../form";
 
 interface RouteContextType {
   routeCoordinates: Coordinates[];
   setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinates[]>>;
-  fetchError: string;
-  setFetchError: React.Dispatch<React.SetStateAction<string>>;
+  errorData: string;
+  setErrorData: React.Dispatch<React.SetStateAction<string>>;
   getRoutes: () => Promise<void>;
   calculateFuelingMarkers: () => Promise<void>;
   coords: number[][];
   fuelingMarkers: Coordinates[];
-  tripInfo: TripInfoProps;
-  pickUpTime: number;
+  tripInfoRef: React.RefObject<TripInfoProps>;
+  pickupTimeRef: React.RefObject<number>
+  tabRef: React.RefObject<string>
+  tab: string;
+  setTab: React.Dispatch<React.SetStateAction<string>>;
+  logData: Logbook[]
+  setLogData: React.Dispatch<React.SetStateAction<Logbook[]>>;
 }
 
 const RouteContext = createContext<RouteContextType | undefined>(undefined);
@@ -42,9 +48,21 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
     totalDistanceMiles: 0,
   });
   const [pickUpTime, setPickUpTime] = useState<number>(0);
-  const [fetchError, setFetchError] = useState<string>("");
+  const [errorData, setErrorData] = useState<string>("");
+  const [tab, setTab] = useState<string>("form");
   const [coords, setCoords] = useState<number[][]>([]);
   const [fuelingMarkers, setFuelingMarkers] = useState<Coordinates[]>([]);
+  const [logData, setLogData] = useState<Logbook[]>([]); 
+
+  const tripInfoRef = useRef(tripInfo)
+  const pickupTimeRef = useRef(pickUpTime)
+  const tabRef = useRef(tab)
+
+  useEffect(() => {
+    tripInfoRef.current = tripInfo;
+    pickupTimeRef.current = pickUpTime
+    tabRef.current = tab
+  }, [tripInfo, pickUpTime, tab])
 
   const getRoutes = useCallback(async () => {
     try {
@@ -54,7 +72,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (!response.ok) {
         const errorData = await response.json();
-        setFetchError(errorData.message);
+        setErrorData(errorData.message);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -70,7 +88,9 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (error) {
       console.error("Error fetching routes:", error);
     }
-  }, [routeCoordinates, setFetchError]);
+  }, [routeCoordinates, setErrorData]);
+
+
 
   const calculateFuelingMarkers = useCallback(async () => {
     if (routeCoordinates.length < 3) {
@@ -135,6 +155,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log("Pickup distance fetched successfully.");
         const pickupRoute = pickupDistanceResponse.body.routes[0];
         setPickUpTime(pickupRoute.duration / 60);
+        console.log("Pickup time", pickupRoute.duration / 60)
       } else {
         console.warn("No pickup routes found.");
       }
@@ -148,6 +169,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
       const totalDistanceMiles = route.distance * 0.000621371; // Convert meters to miles
       const durationMinutes = route.duration / 60;
       setTripInfo({ totalDistanceMiles, totalTimeMinutes: durationMinutes });
+      console.log("Trip info: ", totalDistanceMiles, durationMinutes)
 
       const numFuelingStops = Math.floor(totalDistanceMiles / 1000);
       console.log(`Estimated fueling stops: ${numFuelingStops}`);
@@ -221,14 +243,19 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         routeCoordinates,
         setRouteCoordinates,
-        fetchError,
-        setFetchError,
+        errorData,
+        setErrorData,
         getRoutes,
         coords,
         fuelingMarkers,
         calculateFuelingMarkers,
-        tripInfo,
-        pickUpTime,
+       tripInfoRef,
+       pickupTimeRef,
+       tabRef,
+        setTab,
+        tab,
+        logData,
+        setLogData
       }}
     >
       {children}

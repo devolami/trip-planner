@@ -2,7 +2,7 @@
 import React from "react";
 
 import { Button } from "./Button";
-import { useSubmit } from "./use-submit";
+import { useGenerateLogAndMap } from "./use-generate-log";
 import { InputField } from "./Input";
 import { formConfig } from "./config";
 
@@ -11,11 +11,11 @@ export function TripForm() {
   const {
     hookFormRegister,
     errors,
-    submitForm,
+    generateLogAndMap,
     handleSubmit,
     setValue,
     isLoading,
-  } = useSubmit();
+  } = useGenerateLogAndMap();
  
 
   return (
@@ -23,7 +23,7 @@ export function TripForm() {
       <div className="flex flex-col justify-center items-center w-[90%] md:w-[80%] box-border">
         <form
           className="w-full bg-white p-[30px] flex flex-col items-center justify-center"
-          onSubmit={handleSubmit(submitForm)}
+          onSubmit={handleSubmit(generateLogAndMap)}
           noValidate
         >
           <div className="text-center f m-10">

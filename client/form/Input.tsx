@@ -4,7 +4,7 @@ import { InputFieldProps, InputData, Coordinates } from "./types";
 import mapboxSdk from "@mapbox/mapbox-sdk";
 import geocoding from "@mapbox/mapbox-sdk/services/geocoding";
 import { GeocodeFeature } from "@mapbox/mapbox-sdk/services/geocoding";
-import { useRoute } from "./RouteContext";
+import { useRoute } from "../contexts";
 
 const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN! as string;
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, RefObject} from "react";
+import React, { useState, useEffect, useRef, RefObject } from "react";
 import Map, {
   Marker,
   FullscreenControl,
@@ -10,19 +10,23 @@ import Map, {
   MapRef,
 } from "react-map-gl/mapbox";
 
-import { useRoute } from "../form/RouteContext";
+import { useRoute } from "../contexts";
 import { LngLatBounds } from "mapbox-gl"; // Import LngLatBounds
 
 const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN as string;
 
-
 function TripMap() {
-  const { routeCoordinates, coords, getRoutes, fuelingMarkers, calculateFuelingMarkers } = useRoute();
+  const {
+    routeCoordinates,
+    coords,
+    getRoutes,
+    fuelingMarkers,
+  } = useRoute();
 
   const [viewState, setViewState] = useState({
     longitude: routeCoordinates[0].longitude,
     latitude: routeCoordinates[0].latitude,
-    zoom: 10,
+    zoom: 7,
   });
 
   const mapRef: RefObject<MapRef | null> = useRef(null);
@@ -71,19 +75,21 @@ function TripMap() {
 
 
   useEffect(() => {
-    getRoutes();
+    const fetchRoutes = async () =>{
+      await getRoutes()
+    }
     if (routeCoordinates.length > 0 && mapRef.current) {
       const bounds = new LngLatBounds();
       routeCoordinates.forEach((coord) => {
         bounds.extend([coord.longitude, coord.latitude]);
       });
       mapRef.current.getMap().fitBounds(bounds, {
-        padding: 50, // Add padding around the bounds
-        duration: 0, // Disable animation
+        padding: { top: 50, bottom: 50, left: 50, right: 50 }, // Add padding around the bounds
+        duration: 1000, // Disable animation
       });
     }
-    calculateFuelingMarkers()
-  }, [routeCoordinates, getRoutes, calculateFuelingMarkers]);
+    fetchRoutes()
+  }, [routeCoordinates, getRoutes]);
 
   return (
     <Map
@@ -91,7 +97,7 @@ function TripMap() {
       onMove={(evt) => setViewState(evt.viewState)}
       mapStyle="mapbox://styles/mapbox/streets-v12"
       mapboxAccessToken={ACCESS_TOKEN}
-      style={{ height: "90vh", width: "80vw" }}
+      style={{ height: "100vh", width: "100vw" }}
       ref={mapRef}
     >
       <Source id="routeSource" type="geojson" data={geojson}>
@@ -107,15 +113,15 @@ function TripMap() {
       ))}
 
       {fuelingMarkers.map((marker, index) => {
-        console.log(`This is a marker: ${marker}: ${index}`)
+        console.log(`This is a marker: ${marker}: ${index}`);
         return (
           <Marker
-          key={`fueling-${index}`}
-          longitude={marker.longitude}
-          latitude={marker.latitude}
-          color="red"
-        />
-        )
+            key={`fueling-${index}`}
+            longitude={marker.longitude}
+            latitude={marker.latitude}
+            color="red"
+          />
+        );
       })}
 
       <GeolocateControl />

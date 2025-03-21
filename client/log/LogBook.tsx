@@ -1,14 +1,16 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { autoFillLogbook } from "./FilLogBook";
+// import { autoFillLogbook } from "./FilLogBook";
+import { useRoute } from "../contexts";
 
 const LogBook: React.FC = () => {
   const gridSize = 40; // Each box is 30x30 pixels
-  const logbooks = autoFillLogbook(); // Now returns multiple logbooks
+  // const logbooks = autoFillLogbook(); // Now returns multiple logbooks
+  const {logData} = useRoute();
 
   return (
     <div className="w-full flex flex-col gap-8 p-5 bg-[#f5f5f5] border-solid border-2 border-black">
-      {logbooks.map((logbook, index) => (
+      {logData.length > 0 && logData.map((logbook, index) => (
         <SingleLogbook
           timeSpentInOffDuty={logbook.timeSpentInOffDuty}
           timeSpentInOnDuty={logbook.timeSpentInOnDuty}
