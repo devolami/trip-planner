@@ -3,53 +3,71 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { InputData } from "./types";
 import { useRoute } from "./RouteContext";
 import { useState } from "react";
-// import { useState } from "react";
+
+type LogEntry = {
+  hour: number;
+  row: "off-duty" | "sleeper" | "driving" | "on-duty";
+  action?: string;
+};
+
+type Logbook = {
+  logbook: LogEntry[];
+  currentHour: number;
+  totalTimeTraveled: number;
+  timeSpentInOffDuty: number;
+  timeSpentInOnDuty: number;
+  timeSpentInDriving: number;
+  timeSpentInSleeperBerth: number;
+};
 
 export function useSubmit() {
+  
   const form = useForm<InputData>();
   const {
     register: hookFormRegister,
     handleSubmit,
-    formState,
+    formState: { errors, isSubmitting },
     getValues,
     setValue,
     reset,
   } = form;
-  const { errors, isLoading } = formState;
-  const {getRoutes, tripInfo, pickUpTime} = useRoute()
-  // const [durationMinutes, setDurationMinutes] = useState<number>(0)
-  // const [distanceMiles, setDistanceMiles] = useState<number>(0)
-  const [drawLog, setDrawLog] = useState<boolean>(false)
+
   
+  const { tripInfo, pickUpTime } = useRoute();
+  const [logData, setLogData] = useState<Logbook[]>([]); 
 
+  
   const submitForm: SubmitHandler<InputData> = async (data) => {
+    const API_URL = "http://localhost:8000/api/logs/generate_logbook";
+
     try {
-      const drivingTime = tripInfo.totalTimeMinutes
-      const pickUpAndDropOffTime: number = 60 // in minutes
-      const currentCycleHours = data.current_cycle_hours
-      const remainingCycleHours: number = (70 - currentCycleHours) * 60 // convert to minutes
-      const numFuelingStops: number = Math.floor(tripInfo.totalDistanceMiles / 1000);
-      const totalTimeToRefuel: number = numFuelingStops * 30 // Assuming 30 mins for each refuelling.
-      const totalOnDutyTime: number = drivingTime + totalTimeToRefuel + pickUpAndDropOffTime
-      const timeBeforeRefuel = (drivingTime / tripInfo.totalDistanceMiles) * 1000;
+      const requestData = {
+        current_cycle_hour: data.current_cycle_hours,
+        total_driving_time: tripInfo.totalTimeMinutes,
+        pickup_time: pickUpTime,
+        total_distance_miles: tripInfo.totalDistanceMiles
+      };
 
-      // const distanceFromLocatinoToPickup = 
-      // const DurationFromCurrentToPickup 
-      // if (remainingCycleHours <= totalOnDutyTime){
-      //   setDrawLog(false)
-      // }
-      // else {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(requestData),
+        headers: { "Content-Type": "application/json" },
+      });
 
-      // }
-      console.log(data)
-      console.log()
-      getRoutes()
+      if (!response.ok) {
+        throw new Error(`Error fetching ELD: ${response.status}`);
+      }
+
+      
+      const results: Logbook[] = await response.json();
+      setLogData(results); 
+
     } catch (error) {
-      console.error("Error signing in to your account", error);
-
-      reset();
+      console.error("Error submitting form:", error);
+      reset(); 
     }
   };
+
   return {
     hookFormRegister,
     handleSubmit,
@@ -57,6 +75,7 @@ export function useSubmit() {
     errors,
     getValues,
     setValue,
-    isLoading,
+    isLoading: isSubmitting, 
+    logData, 
   };
 }

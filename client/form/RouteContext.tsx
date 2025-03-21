@@ -3,7 +3,7 @@ import React, { createContext, useState, useContext, useCallback } from "react";
 import mapboxSdk from "@mapbox/mapbox-sdk";
 import Directions from "@mapbox/mapbox-sdk/services/directions";
 import { Coordinates } from "./types";
-import polyline from '@mapbox/polyline';
+import polyline from "@mapbox/polyline";
 
 interface RouteContextType {
   routeCoordinates: Coordinates[];
@@ -13,9 +13,9 @@ interface RouteContextType {
   getRoutes: () => Promise<void>;
   calculateFuelingMarkers: () => Promise<void>;
   coords: number[][];
-  fuelingMarkers: Coordinates[]
-  tripInfo: TripInfoProps
-  pickUpTime: number
+  fuelingMarkers: Coordinates[];
+  tripInfo: TripInfoProps;
+  pickUpTime: number;
 }
 
 const RouteContext = createContext<RouteContextType | undefined>(undefined);
@@ -24,7 +24,7 @@ const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN as string;
 const mapboxClient = mapboxSdk({ accessToken: ACCESS_TOKEN });
 const directionServices = Directions(mapboxClient);
 
-interface TripInfoProps{
+interface TripInfoProps {
   totalTimeMinutes: number;
   totalDistanceMiles: number;
 }
@@ -33,17 +33,18 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [routeCoordinates, setRouteCoordinates] = useState<Coordinates[]>([
-    { latitude: 40.7128, longitude: -74.006},
-    { latitude: 40.7178, longitude: -74.0431},
-    { latitude: 40.7357, longitude: -74.1724},
+    { latitude: 40.7128, longitude: -74.006 },
+    { latitude: 40.7178, longitude: -74.0431 },
+    { latitude: 40.7357, longitude: -74.1724 },
   ]);
   const [tripInfo, setTripInfo] = useState<TripInfoProps>({
-    totalTimeMinutes: 0, totalDistanceMiles: 0
-  })
+    totalTimeMinutes: 0,
+    totalDistanceMiles: 0,
+  });
   const [pickUpTime, setPickUpTime] = useState<number>(0);
   const [fetchError, setFetchError] = useState<string>("");
   const [coords, setCoords] = useState<number[][]>([]);
-    const [fuelingMarkers, setFuelingMarkers] = useState<Coordinates[]>([]);
+  const [fuelingMarkers, setFuelingMarkers] = useState<Coordinates[]>([]);
 
   const getRoutes = useCallback(async () => {
     try {
@@ -61,7 +62,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
       if (data.routes && data.routes.length > 0) {
         const coords = data.routes[0].geometry.coordinates;
         console.log("Coordinates", coords);
-        console.log("Other data", data.routes[0].geometry)
+        console.log("Other data", data.routes[0].geometry);
         setCoords(coords);
       } else {
         console.log("No routes found in the response");
@@ -71,123 +72,149 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [routeCoordinates, setFetchError]);
 
-    const calculateFuelingMarkers = useCallback(async () => {
-      if (routeCoordinates.length < 2) return;
-  
-      try {
-        const firstCoordinate = routeCoordinates[0]
-        const secondCoordinate = routeCoordinates[1]
-        const lastCoordinate = routeCoordinates[2]
+  const calculateFuelingMarkers = useCallback(async () => {
+    if (routeCoordinates.length < 3) {
+      console.error(
+        "Insufficient coordinates for calculating fueling markers."
+      );
+      return;
+    }
 
-        const totalDistanceWaypoints = [
-            { coordinates: [firstCoordinate.longitude, firstCoordinate.latitude] as [number, number] },
-            { coordinates: [lastCoordinate.longitude, lastCoordinate.latitude] as [number, number] },
-        ];
+    try {
+      const [firstCoordinate, secondCoordinate, lastCoordinate] =
+        routeCoordinates;
 
-        const pickupDistanceWaypoints = [
-          { coordinates: [firstCoordinate.longitude, firstCoordinate.latitude] as [number, number] },
-          { coordinates: [secondCoordinate.longitude, secondCoordinate.latitude] as [number, number] },
+      const totalDistanceWaypoints = [
+        {
+          coordinates: [
+            firstCoordinate.longitude,
+            firstCoordinate.latitude,
+          ] as [number, number],
+        },
+        {
+          coordinates: [lastCoordinate.longitude, lastCoordinate.latitude] as [
+            number,
+            number
+          ],
+        },
       ];
-  
-        const totalDistanceResponse = await directionServices
-          .getDirections({
-            waypoints: totalDistanceWaypoints,
-            profile: "driving",
-          })
-          .send();
 
-          const pickupDistanceResponse = await directionServices
-          .getDirections({
-            waypoints: pickupDistanceWaypoints,
-            profile: "driving",
-          })
-          .send();
+      const pickupDistanceWaypoints = [
+        {
+          coordinates: [
+            firstCoordinate.longitude,
+            firstCoordinate.latitude,
+          ] as [number, number],
+        },
+        {
+          coordinates: [
+            secondCoordinate.longitude,
+            secondCoordinate.latitude,
+          ] as [number, number],
+        },
+      ];
 
-        
-          if (pickupDistanceResponse.body.routes && pickupDistanceResponse.body.routes.length > 0) {
-            console.log("Successful! Fetching of pickup distance")
-            const route = pickupDistanceResponse.body.routes[0];
-            console.log("Inspect response: ", route.geometry)
-            const durationMinutes = route.duration / 60;
-            setPickUpTime(durationMinutes)
-          }
-  
-        if (totalDistanceResponse.body.routes && totalDistanceResponse.body.routes.length > 0) {
-          console.log("Successful! Fetching of distance")
-          const route = totalDistanceResponse.body.routes[0];
-          console.log("Inspect response: ", route.geometry)
-          const totalDistanceMiles = route.distance * 0.000621371;
-          const durationMinutes = route.duration / 60;
-          setTripInfo({totalDistanceMiles:totalDistanceMiles, totalTimeMinutes: durationMinutes})
-          const numFuelingStops = Math.floor(totalDistanceMiles / 1000);
-          const fuelingMarkersCoords: Coordinates[] = [];
-          console.log("Number of fuelling stops: ", numFuelingStops)
-  
-          if (numFuelingStops > 0) {
-            let currentDistance = 0;
-            for (let i = 1; i <= numFuelingStops; i++) {
-              const targetDistance = i * 1000;
-              if (route.geometry) {
-                const decodedCoordinates = polyline.decode(route.geometry); // Decode the polyline
-                  console.log("Decoded coordinates: ", decodedCoordinates);                  
-                  for (let j = 0; j < decodedCoordinates.length - 1; j++) {
-                    const segmentStart = decodedCoordinates[j];
-                    const segmentEnd = decodedCoordinates[j + 1];
-                    const segmentDistanceMeters = getDistance(
-                      segmentStart,
-                      segmentEnd
-                    );
-                    const segmentDistanceMiles =
-                      segmentDistanceMeters * 0.000621371;
-    
-                    if (currentDistance + segmentDistanceMiles >= targetDistance) {
-                      const remainingDistance = targetDistance - currentDistance;
-                      const fraction = remainingDistance / segmentDistanceMiles;
-                      const markerLat = segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * fraction; 
-                      const markerLng = segmentStart[1] + (segmentEnd[1] - segmentStart[1]) * fraction; 
-                  
-                      fuelingMarkersCoords.push({ longitude: markerLng, latitude: markerLat });
-                      break;
-                    }
-                    currentDistance += segmentDistanceMiles;
-                    console.log("currentDistance:", currentDistance);
-                    console.log("targetDistance:", targetDistance);
-                    console.log("segmentDistanceMiles:", segmentDistanceMiles);
-                    console.log("segmentStart:", segmentStart);
-                    console.log("segmentEnd:", segmentEnd);
-                  }
-                
-         
-              }
-            }
-            setFuelingMarkers(fuelingMarkersCoords);
-          }
-         
-        } else {
-          console.error("No routes found.");
-        }
-      } catch (error) {
-        console.error("Error calculating fueling markers:", error);
+      const [totalDistanceResponse, pickupDistanceResponse] = await Promise.all(
+        [
+          directionServices
+            .getDirections({
+              waypoints: totalDistanceWaypoints,
+              profile: "driving",
+            })
+            .send(),
+          directionServices
+            .getDirections({
+              waypoints: pickupDistanceWaypoints,
+              profile: "driving",
+            })
+            .send(),
+        ]
+      );
+
+      if (pickupDistanceResponse.body.routes?.length > 0) {
+        console.log("Pickup distance fetched successfully.");
+        const pickupRoute = pickupDistanceResponse.body.routes[0];
+        setPickUpTime(pickupRoute.duration / 60);
+      } else {
+        console.warn("No pickup routes found.");
       }
- 
-    },[routeCoordinates]);
-  
-    const getDistance = (coord1: number[], coord2: number[]): number => {
-      const [lon1, lat1] = coord1;
-      const [lon2, lat2] = coord2;
-      const R = 6371e3;
-      const φ1 = (lat1 * Math.PI) / 180;
-      const φ2 = (lat2 * Math.PI) / 180;
-      const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-      const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-  
-      const a =
-        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-        Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
-      return R * c;
-    };
+
+      if (!totalDistanceResponse.body.routes?.length) {
+        console.error("No total distance routes found.");
+        return;
+      }
+      console.log("Total distance fetched successfully.");
+      const route = totalDistanceResponse.body.routes[0];
+      const totalDistanceMiles = route.distance * 0.000621371; // Convert meters to miles
+      const durationMinutes = route.duration / 60;
+      setTripInfo({ totalDistanceMiles, totalTimeMinutes: durationMinutes });
+
+      const numFuelingStops = Math.floor(totalDistanceMiles / 1000);
+      console.log(`Estimated fueling stops: ${numFuelingStops}`);
+
+      if (numFuelingStops > 0 && route.geometry) {
+        const fuelingMarkersCoords: Coordinates[] = [];
+        const decodedCoordinates = polyline.decode(route.geometry); // Decode polyline once
+
+        let currentDistance = 0;
+        let nextTargetDistance = 1000; // Start at first fueling stop
+
+        for (let j = 0; j < decodedCoordinates.length - 1; j++) {
+          const segmentStart = decodedCoordinates[j];
+          const segmentEnd = decodedCoordinates[j + 1];
+          const segmentDistanceMiles =
+            getDistance(segmentStart, segmentEnd) * 0.000621371; // Convert meters to miles
+
+          currentDistance += segmentDistanceMiles;
+
+          if (currentDistance >= nextTargetDistance) {
+            const remainingDistance =
+              nextTargetDistance - (currentDistance - segmentDistanceMiles);
+            const fraction = remainingDistance / segmentDistanceMiles;
+
+            const markerLat =
+              segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * fraction;
+            const markerLng =
+              segmentStart[1] + (segmentEnd[1] - segmentStart[1]) * fraction;
+
+            fuelingMarkersCoords.push({
+              longitude: markerLng,
+              latitude: markerLat,
+            });
+
+            console.log(
+              `Fuel stop ${fuelingMarkersCoords.length} added at ${markerLat}, ${markerLng}`
+            );
+
+            if (fuelingMarkersCoords.length >= numFuelingStops) break;
+            nextTargetDistance += 1000; // Move to the next fueling stop distance
+          }
+        }
+
+        setFuelingMarkers(fuelingMarkersCoords);
+      }
+    } catch (error) {
+      console.error("Error calculating fueling markers:", error);
+    }
+  }, [routeCoordinates]);
+
+  const getDistance = (coord1: number[], coord2: number[]): number => {
+    const toRadians = (deg: number) => (deg * Math.PI) / 180;
+    const [lon1, lat1] = coord1;
+    const [lon2, lat2] = coord2;
+
+    const R = 6371e3; // Radius of Earth in meters
+    const φ1 = toRadians(lat1);
+    const φ2 = toRadians(lat2);
+    const Δφ = toRadians(lat2 - lat1);
+    const Δλ = toRadians(lon2 - lon1);
+
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))); // Distance in meters
+  };
 
   return (
     <RouteContext.Provider
@@ -201,7 +228,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
         fuelingMarkers,
         calculateFuelingMarkers,
         tripInfo,
-        pickUpTime
+        pickUpTime,
       }}
     >
       {children}

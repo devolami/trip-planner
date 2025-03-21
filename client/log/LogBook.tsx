@@ -211,10 +211,10 @@ const SingleLogbook: React.FC<LogbookProps> = ({
               return (
                 <div
                   key={index}
-                  className="absolute text-xs font-bold text-black rotate-45 pt-12 tracking-wide"
+                  className="absolute text-xs font-bold text-black rotate-45 pt-12 tracking-wider"
                   style={{
                     left: `${x - 6}px`,
-                    top: "200px",
+                    top: "205px",
                   }}
                 >
                   {entry.action}
