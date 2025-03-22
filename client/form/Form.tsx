@@ -23,7 +23,7 @@ export function TripForm() {
           Plan Your Perfect Route
         </h1>
         <p className="my-3 md:my-4">
-          Optimize your journey with smart rest stops and ELD-compliant
+          Optimize your journey with smart rest stops and HOS-compliant
           schedules
         </p>
       </div>
