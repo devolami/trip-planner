@@ -129,7 +129,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           <p className="text-[#FF8A00] text-[12px]">
             {errors[fieldConfig.name]?.message}
           </p>
-          <p className="text-gray-600 text-[12px]">
+          <p className="text-gray-600 text-[12px] text-center">
             {fieldConfig?.description}
           </p>
         </div>

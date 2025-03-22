@@ -1,27 +1,37 @@
 "use client";
 import { useEffect, useRef } from "react";
-// import { autoFillLogbook } from "./FilLogBook";
+
 import { useRoute } from "../contexts";
 
 const LogBook: React.FC = () => {
   const gridSize = 40; // Each box is 30x30 pixels
-  // const logbooks = autoFillLogbook(); // Now returns multiple logbooks
-  const {logData} = useRoute();
+ 
+  const { logData } = useRoute();
 
   return (
     <div className="w-full flex flex-col gap-8 p-5 bg-[#f5f5f5] border-solid border-2 border-black">
-      {logData && logData.length > 0 && logData.map((logbook, index) => (
-        <SingleLogbook
-          timeSpentInOffDuty={logbook.timeSpentInOffDuty}
-          timeSpentInOnDuty={logbook.timeSpentInOnDuty}
-          timeSpentInDriving={logbook.timeSpentInDriving}
-          timeSpentInSleeperBerth={logbook.timeSpentInSleeperBerth}
-          key={index}
-          logbook={logbook.logbook}
-          gridSize={gridSize}
-          day={index + 1}
-        />
-      ))}
+      <div className="flex flex-col justify-center items-center my-6 px-6 text-center">
+        <h1 className="text-3xl md:text-5xl font-bold text-[#1D2939]">
+        ELD Log Generator
+        </h1>
+        <p className="my-3 md:my-4">
+        View and manage your automatically generated ELD logs based on your trip details
+        </p>
+      </div>
+      {logData &&
+        logData.length > 0 &&
+        logData.map((logbook, index) => (
+          <SingleLogbook
+            timeSpentInOffDuty={logbook.timeSpentInOffDuty}
+            timeSpentInOnDuty={logbook.timeSpentInOnDuty}
+            timeSpentInDriving={logbook.timeSpentInDriving}
+            timeSpentInSleeperBerth={logbook.timeSpentInSleeperBerth}
+            key={index}
+            logbook={logbook.logbook}
+            gridSize={gridSize}
+            day={index + 1}
+          />
+        ))}
     </div>
   );
 };
@@ -82,37 +92,37 @@ const SingleLogbook: React.FC<LogbookProps> = ({
     const drawGrid = () => {
       ctx.strokeStyle = "black";
       ctx.lineWidth = 1;
-    
+
       for (let x = 0; x <= canvas.width; x += gridSize) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
         ctx.stroke();
-    
-        // 🎯 Draw small lines inside each grid in all rows
+
+        //  Draw small lines inside each grid in all rows
         const interval = gridSize / 4; // Divide each grid into 4 equal parts
-    
+
         for (let y = 0; y < canvas.height; y += gridSize) {
-          // ✅ First small line (10px)
+          // First small line (10px)
           ctx.beginPath();
           ctx.moveTo(x + interval, y); // Start at top of the box
           ctx.lineTo(x + interval, y + 10); // 10px height
           ctx.stroke();
-    
-          // ✅ Middle line (20px)
+
+          //  Middle line (20px)
           ctx.beginPath();
           ctx.moveTo(x + 2 * interval, y);
           ctx.lineTo(x + 2 * interval, y + 20); // 20px height
           ctx.stroke();
-    
-          // ✅ Third small line (10px)
+
+          // Third small line (10px)
           ctx.beginPath();
           ctx.moveTo(x + 3 * interval, y);
           ctx.lineTo(x + 3 * interval, y + 10); // 10px height
           ctx.stroke();
         }
       }
-    
+
       for (let y = 0; y <= canvas.height; y += gridSize) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -120,8 +130,6 @@ const SingleLogbook: React.FC<LogbookProps> = ({
         ctx.stroke();
       }
     };
-    
-    
 
     const drawLogbook = () => {
       ctx.strokeStyle = "black";
@@ -157,9 +165,9 @@ const SingleLogbook: React.FC<LogbookProps> = ({
   return (
     <div className="h-[350px] flex flex-col items-center gap-1 border-solid border-2 border-black pl-10">
       <h3 className="text-lg font-bold">Day {day}</h3>
-      {/* ✅ Scrollable Wrapper */}
+      {/*  Scrollable Wrapper */}
       <div className="w-full h-full overflow-x-auto flex flex-row gap-2 whitespace-nowrap">
-        {/* ✅ Duty Labels */}
+        {/* Duty Labels */}
         <div className="text-xs font-bold flex flex-col items-end gap-6 whitespace-nowrap pt-12">
           <p>Off Duty</p>
           <p>Sleeper Berth</p>
@@ -170,11 +178,15 @@ const SingleLogbook: React.FC<LogbookProps> = ({
           </div>
         </div>
 
-        {/* ✅ Main Canvas Container */}
+        {/* Main Canvas Container */}
         <div className="relative flex flex-col min-h-0 pt-12">
           <canvas ref={canvasRef}></canvas>
           <div className="flex flex-row gap-6 absolute top-[-2px] left-[-30px] text-xs font-bold bg-[#9E77ED] text-white p-2 justify-center items-end">
-            <p className="mr-[-10px]">Mid-<br/>Night</p>
+            <p className="mr-[-10px]">
+              Mid-
+              <br />
+              Night
+            </p>
             <p>1</p>
             <p className="mr-2">2</p>
             <p className="mr-3">3</p>
@@ -198,11 +210,17 @@ const SingleLogbook: React.FC<LogbookProps> = ({
             <p>9</p>
             <p>10</p>
             <p className="mr-1">11</p>
-            <p className="mr-[-8px]">Mid-<br/>Night</p>
-            <p>Total <br/> Hours</p>
+            <p className="mr-[-8px]">
+              Mid-
+              <br />
+              Night
+            </p>
+            <p>
+              Total <br /> Hours
+            </p>
           </div>
 
-          {/* ✅ On-Duty Actions */}
+          {/* On-Duty Actions */}
           {logbook.map((entry, index, arr) => {
             if (
               entry.row === "on-duty" &&
@@ -226,7 +244,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
           })}
         </div>
 
-        {/* ✅ Total Hours for Each Duty */}
+        {/*  Total Hours for Each Duty */}
         <div className="flex flex-col font-bold pt-12">
           <div className="w-[45px] h-[40px] bg-[#DAC0FD] border-b-[1px] flex flex-row justify-center items-center">
             {!Number.isInteger(timeSpentInOffDuty)
