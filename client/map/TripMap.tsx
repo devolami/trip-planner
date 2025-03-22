@@ -20,7 +20,7 @@ function TripMap() {
     routeCoordinates,
     coords,
     getRoutes,
-    fuelingMarkers,
+    fuelingMarkersRef,
   } = useRoute();
 
   const [viewState, setViewState] = useState({
@@ -30,6 +30,8 @@ function TripMap() {
   });
 
   const mapRef: RefObject<MapRef | null> = useRef(null);
+  const fuelingMarkers = fuelingMarkersRef.current
+  console.log("These are the refuelling markers", fuelingMarkers)
 
   const geojson: {
     type: "FeatureCollection";
