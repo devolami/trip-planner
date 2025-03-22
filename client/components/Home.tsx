@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { TripMap } from "../map";
 import { LogBook } from "../log";
@@ -5,20 +6,20 @@ import { LogBook } from "../log";
 import { TripForm } from "../form";
 import { useRoute } from "../contexts";
 
-export function Home() {
-  const { tab} = useRoute();
-  
+export default function Home() {
+  const { tab } = useRoute();
+
   return (
     <div>
       {tab === "MapAndLog" && <MapLog />}
       {tab === "form" && <TripForm />}
-      {tab === "error" && <FetchError />}
+    
     </div>
   );
 }
 
 export function MapLog() {
-  const { tab} = useRoute();
+  const { tab } = useRoute();
   return (
     <React.Fragment>
       <LogBook />
@@ -45,13 +46,4 @@ export function MapLog() {
       </div>
     </React.Fragment>
   );
-}
-
-export function FetchError(){
-  const {errorData} = useRoute()
-  return (
-    <div className="flex flex-col justify-center items-center w-screen h-screen">
-      <p className="text-4xl m-auto p-4 text-gray-600">{errorData}</p>
-    </div>
-  )
 }

@@ -2,6 +2,9 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { InputData } from "./types";
 import { useRoute } from "../contexts";
+import { useRouter } from "next/navigation";
+
+const API_URL: string = process.env.NEXT_PUBLIC_BASE_ENDPOINT as string;
 
 export function useGenerateLogAndMap() {
   const form = useForm<InputData>();
@@ -21,10 +24,12 @@ export function useGenerateLogAndMap() {
     setTab,
     calculateFuelingMarkers,
     setErrorData,
+    tab,
   } = useRoute();
+  const router = useRouter()
 
   const generateLogAndMap: SubmitHandler<InputData> = async (data) => {
-    const API_URL = "http://localhost:8000/api/logs/generate_logbook/";
+    
 
     try {
       await calculateFuelingMarkers();
@@ -50,13 +55,16 @@ export function useGenerateLogAndMap() {
 
       if (!response.ok) {
         setErrorData(responseData);
-        console.log(responseData)
-        setTab("error");
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        console.log("This is from the error bock", responseData)
+        router.push("/error-response")
       }
-
-      setLogData(responseData);
-
-      setTab("MapAndLog");
+      if (response.ok) {
+        setLogData(responseData);
+        console.log("Hey! Here is our logbook", responseData)
+        setTab("MapAndLog");
+        console.log("From the success block, set tab to", tab, responseData);
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
       reset();

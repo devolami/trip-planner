@@ -1,6 +1,5 @@
-"use client";
 import { RouteProvider } from "@/client/contexts";
-import { Home } from "@/client/components/Home";
+import { Home } from "@/client/components";
 export default function Page() {
   
   return (

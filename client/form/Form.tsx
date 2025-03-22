@@ -47,6 +47,7 @@ export function TripForm() {
               {isLoading ? "Generating..." : "Generate route and logs"}
             </Button>
           </div>
+        <p className="my-5 text-xs text-gray-600">Your trip data is processed on your device and never stored on any servers.</p>
         </form>
       </div>
     </div>

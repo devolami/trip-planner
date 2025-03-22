@@ -17,11 +17,11 @@ interface RouteContextType {
   fuelingMarkers: Coordinates[];
   tripInfoRef: React.RefObject<TripInfoProps>;
   pickupTimeRef: React.RefObject<number>
-  tabRef: React.RefObject<string>
+  errorDataRef: React.RefObject<string>
   tab: string;
   setTab: React.Dispatch<React.SetStateAction<string>>;
-  logData: Logbook[]
-  setLogData: React.Dispatch<React.SetStateAction<Logbook[]>>;
+  logData: Logbook[] | null
+  setLogData: React.Dispatch<React.SetStateAction<Logbook[] | null>>;
 }
 
 const RouteContext = createContext<RouteContextType | undefined>(undefined);
@@ -52,17 +52,19 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tab, setTab] = useState<string>("form");
   const [coords, setCoords] = useState<number[][]>([]);
   const [fuelingMarkers, setFuelingMarkers] = useState<Coordinates[]>([]);
-  const [logData, setLogData] = useState<Logbook[]>([]); 
+  const [logData, setLogData] = useState<Logbook[] | null >(null); 
 
   const tripInfoRef = useRef(tripInfo)
   const pickupTimeRef = useRef(pickUpTime)
-  const tabRef = useRef(tab)
+  const errorDataRef = useRef(errorData)
+  
 
   useEffect(() => {
     tripInfoRef.current = tripInfo;
     pickupTimeRef.current = pickUpTime
-    tabRef.current = tab
-  }, [tripInfo, pickUpTime, tab])
+    errorDataRef.current = errorData
+   
+  }, [tripInfo, pickUpTime, errorData])
 
   const getRoutes = useCallback(async () => {
     try {
@@ -251,7 +253,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
         calculateFuelingMarkers,
        tripInfoRef,
        pickupTimeRef,
-       tabRef,
+       errorDataRef,
         setTab,
         tab,
         logData,

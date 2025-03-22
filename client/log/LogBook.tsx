@@ -10,7 +10,7 @@ const LogBook: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col gap-8 p-5 bg-[#f5f5f5] border-solid border-2 border-black">
-      {logData.length > 0 && logData.map((logbook, index) => (
+      {logData && logData.length > 0 && logData.map((logbook, index) => (
         <SingleLogbook
           timeSpentInOffDuty={logbook.timeSpentInOffDuty}
           timeSpentInOnDuty={logbook.timeSpentInOnDuty}
