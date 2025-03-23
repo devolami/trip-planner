@@ -18,6 +18,9 @@ const LogBook: React.FC = () => {
         View and manage your automatically generated ELD logs based on your trip details
         </p>
       </div>
+       {/* <div className="m-2 text-right">
+            <button className="bg-[#9E77ED] p-4 text-white max-w-[50px] text-right">Download</button>
+            </div> */}
       {logData &&
         logData.length > 0 &&
         logData.map((logbook, index) => (
@@ -168,7 +171,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
       {/*  Scrollable Wrapper */}
       <div className="w-full h-full overflow-x-auto flex flex-row gap-2 whitespace-nowrap">
         {/* Duty Labels */}
-        <div className="text-xs font-bold flex flex-col items-end gap-6 whitespace-nowrap pt-12">
+        <div className="text-xs font-bold flex flex-col items-end gap-6 whitespace-nowrap pt-12 text-gray-600">
           <p>Off Duty</p>
           <p>Sleeper Berth</p>
           <p>Driving</p>
@@ -246,22 +249,22 @@ const SingleLogbook: React.FC<LogbookProps> = ({
 
         {/*  Total Hours for Each Duty */}
         <div className="flex flex-col font-bold pt-12">
-          <div className="w-[45px] h-[40px] bg-[#DAC0FD] border-b-[1px] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#DAC0FD] border-b-[1px] flex flex-row justify-center items-center text-[#1D2939]">
             {!Number.isInteger(timeSpentInOffDuty)
               ? `${Math.trunc(timeSpentInOffDuty)}:30`
               : `${timeSpentInOffDuty}:00`}
           </div>
-          <div className="w-[45px] h-[40px] bg-[#FFECC5] border-b-[1px] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#FFECC5] border-b-[1px] flex flex-row justify-center items-center text-[#1D2939]">
             {!Number.isInteger(timeSpentInSleeperBerth)
               ? `${Math.trunc(timeSpentInSleeperBerth)}:30`
               : `${timeSpentInSleeperBerth}:00`}
           </div>
-          <div className="w-[45px] h-[40px] bg-[#CFFFE8] border-b-[1px] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#CFFFE8] border-b-[1px] flex flex-row justify-center items-center text-[#1D2939]">
             {!Number.isInteger(timeSpentInDriving)
               ? `${Math.trunc(timeSpentInDriving)}:30`
               : `${timeSpentInDriving}:00`}
           </div>
-          <div className="w-[45px] h-[40px] bg-[#C9F5FF] flex flex-row justify-center items-center">
+          <div className="w-[45px] h-[40px] bg-[#C9F5FF] flex flex-row justify-center items-center text-[#1D2939]">
             {!Number.isInteger(timeSpentInOnDuty)
               ? `${Math.trunc(timeSpentInOnDuty)}:30`
               : `${timeSpentInOnDuty}:00`}

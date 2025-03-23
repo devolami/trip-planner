@@ -22,6 +22,7 @@ export function MapLog() {
   const { tab } = useRoute();
   return (
     <React.Fragment>
+     
       <LogBook />
       <div className="relative flex flex-col justify-center items-center">
         {tab === "MapAndLog" && <TripMap />}
