@@ -14,7 +14,7 @@ const LogBook: React.FC = () => {
         <h1 className="text-3xl md:text-5xl font-bold text-[#1D2939]">
         ELD Log Generator
         </h1>
-        <p className="my-3 md:my-4">
+        <p className="my-3 md:my-4 text-[#1D2939]">
         View and manage your automatically generated ELD logs based on your trip details
         </p>
       </div>
