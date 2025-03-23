@@ -23,7 +23,7 @@ export function TripForm() {
         <h1 className="text-3xl md:text-5xl font-bold text-[#1D2939]">
           Plan Your Perfect Route
         </h1>
-        <p className="my-3 md:my-4">
+        <p className="my-3 md:my-4 text-[#1D2939]">
           Optimize your journey with smart rest stops and HOS-compliant
           schedules
         </p>
