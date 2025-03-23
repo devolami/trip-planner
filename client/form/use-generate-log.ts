@@ -7,7 +7,10 @@ import { useRouter } from "next/navigation";
 const API_URL: string = process.env.NEXT_PUBLIC_BASE_ENDPOINT as string;
 
 export function useGenerateLogAndMap() {
-  const form = useForm<InputData>();
+  const form = useForm<InputData>({
+    mode: "onChange",
+    defaultValues: {current_cycle_hours: 0, current_location: "", drop_off_location: "", pickup_location: ""}
+  });
   const {
     register: hookFormRegister,
     handleSubmit,
@@ -15,6 +18,7 @@ export function useGenerateLogAndMap() {
     getValues,
     setValue,
     reset,
+    watch,
   } = form;
 
   const {
@@ -26,11 +30,17 @@ export function useGenerateLogAndMap() {
     setErrorData,
     tab,
   } = useRoute();
-  const router = useRouter()
+  const router = useRouter();
+  const watchFields = watch();
+  
+  // const hasTyped = Object.values(watchFields).some((value) =>
+  //   typeof value === "number" ? value > 0 : value.length > 0
+  // );
+  const hasTyped = Object.values(watchFields).every((value) =>
+    typeof value === "number" ? value >= 0 : value.length > 0
+  );
 
   const generateLogAndMap: SubmitHandler<InputData> = async (data) => {
-    
-
     try {
       await calculateFuelingMarkers();
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -56,12 +66,12 @@ export function useGenerateLogAndMap() {
       if (!response.ok) {
         setErrorData(responseData);
         await new Promise((resolve) => setTimeout(resolve, 500));
-        console.log("This is from the error bock", responseData)
-        router.push("/error-response")
+        console.log("This is from the error bock", responseData);
+        router.push("/error-response");
       }
       if (response.ok) {
         setLogData(responseData);
-        console.log("Hey! Here is our logbook", responseData)
+        console.log("Hey! Here is our logbook", responseData);
         setTab("MapAndLog");
         console.log("From the success block, set tab to", tab, responseData);
       }
@@ -78,6 +88,7 @@ export function useGenerateLogAndMap() {
     errors,
     getValues,
     setValue,
-    isLoading: isSubmitting,
+    isSubmitting,
+    hasTyped,
   };
 }

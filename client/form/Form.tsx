@@ -13,7 +13,8 @@ export function TripForm() {
     generateLogAndMap,
     handleSubmit,
     setValue,
-    isLoading,
+    isSubmitting,
+    hasTyped
   } = useGenerateLogAndMap();
 
   return (
@@ -50,8 +51,8 @@ export function TripForm() {
             />
           </div>
           <div className="mt-10">
-            <Button disabled={isLoading}>
-              {isLoading ? "Generating..." : "Generate route and logs"}
+            <Button disabled={ isSubmitting || !hasTyped}>
+              {isSubmitting ? "Generating..." : "Generate route and logs"}
             </Button>
           </div>
           <p className="my-5 text-xs text-gray-600 text-center">

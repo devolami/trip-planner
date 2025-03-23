@@ -87,7 +87,7 @@ export const InputField: React.FC<InputFieldProps> = ({
             type={fieldConfig.type}
             placeholder={fieldConfig.placeholder}
             id={fieldConfig.id}
-            className="my-[10px] p-[20px] rounded-sm border-[1.5px] border-[#F4EBFF] w-full font-normal text-[16px] bg-white text-[#364259] focus:outline-none focus:border-[#F4EBFF]"
+            className="my-[10px] p-[20px] rounded-sm border-[1.5px] border-[#F4EBFF] w-full font-normal text-[16px] bg-white text-[#364259] focus:outline-none focus:border-[#9E77ED]"
             onChange={handleInputChange(fieldConfig.name, index)}
           />
 
@@ -118,7 +118,7 @@ export const InputField: React.FC<InputFieldProps> = ({
                         setSuggestions([]);
                       }}
                       key={suggestion.id}
-                      className="cursor-pointer m-4"
+                      className="cursor-pointer m-4 text-gray-600"
                     >
                       {suggestion.place_name}
                     </li>
