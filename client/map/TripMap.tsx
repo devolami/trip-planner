@@ -31,7 +31,7 @@ function TripMap() {
 
   const mapRef: RefObject<MapRef | null> = useRef(null);
   const fuelingMarkers = fuelingMarkersRef.current
-  console.log("These are the refuelling markers", fuelingMarkers)
+  
 
   const geojson: {
     type: "FeatureCollection";
@@ -115,7 +115,7 @@ function TripMap() {
       ))}
 
       {fuelingMarkers.map((marker, index) => {
-        console.log(`This is a marker: ${marker}: ${index}`);
+       
         return (
           <Marker
             key={`fueling-${index}`}

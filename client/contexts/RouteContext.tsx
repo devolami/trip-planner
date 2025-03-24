@@ -89,8 +89,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
       const data = await response.json();
       if (data.routes && data.routes.length > 0) {
         const coords = data.routes[0].geometry.coordinates;
-        console.log("Coordinates", coords);
-        console.log("Other data", data.routes[0].geometry);
+        
         setCoords(coords);
       } else {
         console.log("No routes found in the response");
@@ -170,7 +169,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error("No total distance routes found.");
         return;
       }
-      console.log("Total distance fetched successfully.");
+      
       const route = totalDistanceResponse.body.routes[0];
       const totalDistanceMiles = route.distance * 0.000621371; // Convert meters to miles
       const durationMinutes = route.duration / 60;
@@ -191,7 +190,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
             const segmentEnd = decodedCoordinates[j + 1];
             const segmentDistanceMiles =
               getDistance(segmentStart, segmentEnd) * 0.000621371; // Convert meters to miles
-              console.log("Current distance: ", currentDistance, i, j)
+              
               
 
             if (currentDistance >= targetDistance) {
@@ -202,11 +201,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
                 segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * fraction;
               const markerLng =
                 segmentStart[1] + (segmentEnd[1] - segmentStart[1]) * fraction;
-              console.log("Pushing marker:", {
-                longitude: markerLng,
-                latitude: markerLat,
-              });
-
+              
               fuelingMarkersCoords.push({
                 longitude: markerLng,
                 latitude: markerLat,
@@ -216,7 +211,7 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
             currentDistance += segmentDistanceMiles;
           }
         }
-        console.log("Refuelling markers from context", fuelingMarkersCoords);
+       
         setFuelingMarkers(fuelingMarkersCoords);
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
@@ -224,23 +219,6 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Error calculating fueling markers:", error);
     }
   }, [routeCoordinates]);
-
-  // const getDistance = (coord1: number[], coord2: number[]): number => {
-  //   const [lon1, lat1] = coord1;
-  //   const [lon2, lat2] = coord2;
-  //   const R = 6371e3;
-  //   const φ1 = (lat1 * Math.PI) / 180;
-  //   const φ2 = (lat2 * Math.PI) / 180;
-  //   const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-  //   const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-
-  //   const a =
-  //     Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-  //     Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  //   return R * c;
-  // };
 
   const getDistance = (coord1: number[], coord2: number[]): number => {
     const toRadians = (deg: number) => (deg * Math.PI) / 180;

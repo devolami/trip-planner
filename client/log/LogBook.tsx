@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRoute } from "../contexts";
 
 const LogBook: React.FC = () => {
-  const gridSize = 40; // Each box is 30x30 pixels
+  const gridSize = 40; // Each box is 40x40 pixels
  
   const { logData } = useRoute();
 
@@ -18,9 +18,6 @@ const LogBook: React.FC = () => {
         View and manage your automatically generated ELD logs based on your trip details
         </p>
       </div>
-       {/* <div className="m-2 text-right">
-            <button className="bg-[#9E77ED] p-4 text-white max-w-[50px] text-right">Download</button>
-            </div> */}
       {logData &&
         logData.length > 0 &&
         logData.map((logbook, index) => (

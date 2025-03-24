@@ -28,14 +28,11 @@ export function useGenerateLogAndMap() {
     setTab,
     calculateFuelingMarkers,
     setErrorData,
-    tab,
+ 
   } = useRoute();
   const router = useRouter();
   const watchFields = watch();
   
-  // const hasTyped = Object.values(watchFields).some((value) =>
-  //   typeof value === "number" ? value > 0 : value.length > 0
-  // );
   const hasTyped = Object.values(watchFields).every((value) =>
     typeof value === "number" ? value >= 0 : value.length > 0
   );
@@ -66,14 +63,14 @@ export function useGenerateLogAndMap() {
       if (!response.ok) {
         setErrorData(responseData);
         await new Promise((resolve) => setTimeout(resolve, 500));
-        console.log("This is from the error bock", responseData);
+        
         router.push("/error-response");
       }
       if (response.ok) {
         setLogData(responseData);
-        console.log("Hey! Here is our logbook", responseData);
+        
         setTab("MapAndLog");
-        console.log("From the success block, set tab to", tab, responseData);
+      
       }
     } catch (error) {
       console.error("Error submitting form:", error);

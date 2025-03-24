@@ -3,8 +3,7 @@ import { useRoute } from "@/client/contexts";
 export default function ErrorResponse() {
   const { errorDataRef } = useRoute();
   const errorData = errorDataRef.current;
-  console.log("This is coming from the error page: ", errorData);
-
+ 
   return (
     <div className="flex flex-col justify-center items-center">
       <p className="mt-20 text-4xl md:text-8xl">Oops!.... </p>

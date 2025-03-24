@@ -1,6 +1,5 @@
 "use client"
-export default function ErrorBoundary({error}:{error: Error}){
-    console.log(error.message)
+export default function ErrorBoundary(){
     return (
         <div className="mt-[150px] flex flex-col items-center justify-center">
             <p className="text-2xl font-bold mb-4">An error occurred!</p>
