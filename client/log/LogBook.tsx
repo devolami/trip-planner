@@ -262,7 +262,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
                   className="absolute w-auto text-xs font-bold text-black rotate-45 pt-12 tracking-wider"
                   style={{
                     left: `${x -2}px`,
-                    top: "240px",
+                    top: "230px",
                   }}
                 >
                   <p className="border-b-[2px] border-black">{entry.action}</p>
