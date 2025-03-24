@@ -166,7 +166,7 @@ const SingleLogbook: React.FC<LogbookProps> = ({
   }, [logbook, gridSize]);
 
   return (
-    <div className="h-[350px] flex flex-col items-center gap-1 border-solid border-2 border-black pl-10">
+    <div className="h-[450px] flex flex-col items-center gap-1 border-solid border-2 border-black pl-10">
       <h3 className="text-lg font-bold">Day {day}</h3>
       {/*  Scrollable Wrapper */}
       <div className="w-full h-full overflow-x-auto flex flex-row gap-2 whitespace-nowrap">
@@ -231,16 +231,42 @@ const SingleLogbook: React.FC<LogbookProps> = ({
               arr[index - 1].row === "on-duty"
             ) {
               const x = entry.hour * gridSize;
+                           
               return (
                 <div
                   key={index}
-                  className="absolute text-xs font-bold text-black rotate-45 pt-12 tracking-wider"
+                  className="absolute w-auto text-xs font-bold text-black rotate-45 pt-12 tracking-wider"
                   style={{
-                    left: `${x - 6}px`,
-                    top: "205px",
+                    left: `${x -2}px`,
+                    top: "240px",
                   }}
                 >
-                  {entry.action}
+                  <p className="border-b-[2px] border-black">{entry.action}</p>
+                 
+                </div>
+              );
+            }
+          })}
+             {/* Off-Duty Actions */}
+             {logbook.map((entry, index, arr) => {
+            if (
+              entry.row === "off-duty" &&
+              index > 0 &&
+              arr[index - 1].row === "off-duty"
+            ) {
+              const x = entry.hour * gridSize;
+                            
+              return (
+                <div
+                  key={index}
+                  className="absolute w-auto text-xs font-bold text-black rotate-45 pt-12 tracking-wider"
+                  style={{
+                    left: `${x -2}px`,
+                    top: "240px",
+                  }}
+                >
+                  <p className="border-b-[2px] border-black">{entry.action}</p>
+                 
                 </div>
               );
             }
