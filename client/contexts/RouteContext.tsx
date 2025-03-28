@@ -191,11 +191,14 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
             const segmentDistanceMiles =
               getDistance(segmentStart, segmentEnd) * 0.000621371; // Convert meters to miles
               
-              
-
             if (currentDistance >= targetDistance) {
               const remainingDistance = targetDistance - currentDistance;
-              const fraction = remainingDistance / segmentDistanceMiles;
+             // Clamping fraction to ensure markers are not of the road.
+              const fraction = Math.min(
+                Math.max(remainingDistance / segmentDistanceMiles, 0),
+                1
+              );
+              
 
               const markerLat =
                 segmentStart[0] + (segmentEnd[0] - segmentStart[0]) * fraction;
