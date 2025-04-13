@@ -24,10 +24,6 @@ export type InputConfigProps = {
   export type Coordinates = {
     latitude: number;
     longitude: number;
-    // placeName: string;
-    // city: string | undefined
-    // region: string | undefined
-    // address: string | undefined
   };
   export type InputFieldProps = {
     config: InputConfigProps[];
@@ -51,15 +47,3 @@ export type InputConfigProps = {
     timeSpentInDriving: number;
     timeSpentInSleeperBerth: number;
   };
-
-  // export type Logbook = {
-  //   logbook: LogEntry[];
-  //   totalTimeTraveled: number;
-  //   // currentHour: number;
-  //   timeSpent: {
-  //     "off_duty": number,
-  //     "sleeper": number,
-  //     "driving": number,
-  //     "on_duty": number
-  //   }
-  // };
