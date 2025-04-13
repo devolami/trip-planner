@@ -51,3 +51,15 @@ export type InputConfigProps = {
     timeSpentInDriving: number;
     timeSpentInSleeperBerth: number;
   };
+
+  // export type Logbook = {
+  //   logbook: LogEntry[];
+  //   totalTimeTraveled: number;
+  //   // currentHour: number;
+  //   timeSpent: {
+  //     "off_duty": number,
+  //     "sleeper": number,
+  //     "driving": number,
+  //     "on_duty": number
+  //   }
+  // };

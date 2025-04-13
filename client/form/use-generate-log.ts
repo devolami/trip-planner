@@ -67,8 +67,7 @@ export function useGenerateLogAndMap() {
         router.push("/error-response");
       }
       if (response.ok) {
-        setLogData(responseData);
-        
+        setLogData(responseData);      
         setTab("MapAndLog");
       
       }

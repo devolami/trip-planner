@@ -16,12 +16,7 @@ import { LngLatBounds } from "mapbox-gl"; // Import LngLatBounds
 const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN as string;
 
 function TripMap() {
-  const {
-    routeCoordinates,
-    coords,
-    getRoutes,
-    fuelingMarkersRef,
-  } = useRoute();
+  const { routeCoordinates, coords, getRoutes, fuelingMarkersRef } = useRoute();
 
   const [viewState, setViewState] = useState({
     longitude: routeCoordinates[0].longitude,
@@ -30,8 +25,7 @@ function TripMap() {
   });
 
   const mapRef: RefObject<MapRef | null> = useRef(null);
-  const fuelingMarkers = fuelingMarkersRef.current
-  
+  const fuelingMarkers = fuelingMarkersRef.current;
 
   const geojson: {
     type: "FeatureCollection";
@@ -75,11 +69,10 @@ function TripMap() {
     },
   };
 
-
   useEffect(() => {
-    const fetchRoutes = async () =>{
-      await getRoutes()
-    }
+    const fetchRoutes = async () => {
+      await getRoutes();
+    };
     if (routeCoordinates.length > 0 && mapRef.current) {
       const bounds = new LngLatBounds();
       routeCoordinates.forEach((coord) => {
@@ -90,7 +83,7 @@ function TripMap() {
         duration: 1000, // Disable animation
       });
     }
-    fetchRoutes()
+    fetchRoutes();
   }, [routeCoordinates, getRoutes]);
 
   return (
@@ -113,9 +106,7 @@ function TripMap() {
           color={index === 0 ? "green" : index === 1 ? "yellow" : "purple"}
         />
       ))}
-
       {fuelingMarkers.map((marker, index) => {
-       
         return (
           <Marker
             key={`fueling-${index}`}
